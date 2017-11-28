@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="5dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginLeft="5dp"
+    android:elevation="5dp"
+    android:padding="2dp"
+    app:cardCornerRadius="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="89dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="?attr/colorButtonNormal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/alarmeDays_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:background="@drawable/rounds_tv"
+            android:gravity="center"
+            android:text="Lun. Mar. Mer. Jeu. Ven. Sam. Dim."
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/alarmeHour_tv"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:background="@drawable/costumize_button"
+            android:clickable="true"
+            android:gravity="center"
+            android:text="20h:30min"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+        <ImageButton
+            android:id="@+id/editAlarm_img"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            app:srcCompat="@android:drawable/ic_menu_edit" />
+
+        <ImageButton
+            android:id="@+id/deleteAlarm_img"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/alarmeHour_tv"
+            app:srcCompat="@android:drawable/ic_menu_delete"
+            android:layout_alignLeft="@+id/editAlarm_img"
+            android:layout_alignStart="@+id/editAlarm_img" />
+
+        <TextView
+            android:id="@+id/alarmeSound_tv"
+            android:layout_width="150dp"
+            android:layout_height="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/rounds_tv"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:lines="1"
+            android:text="sound name"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/alarmeLibelle_tv"
+            android:layout_width="200dp"
+            android:layout_height="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="18dp"
+            android:layout_marginStart="18dp"
+            android:layout_toEndOf="@+id/alarmeSound_tv"
+            android:layout_toRightOf="@+id/alarmeSound_tv"
+            android:background="@drawable/rounds_tv"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:lines="1"
+            android:text="TextView"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

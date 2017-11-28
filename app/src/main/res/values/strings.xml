@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Fattelima</string>
+    <string name="action_settings">Settings</string>
+    <string name="libelle">Libellé</string>
+    <string name="repeter">Repeter</string>
+    <string name="terminer">Terminer</string>
+</resources>
