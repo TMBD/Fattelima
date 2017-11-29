@@ -98,7 +98,7 @@ public class HomeActivity extends AppCompatActivity {
                         alarmeDialog.hide();
                     }
                 });
-                
+
             }
         });
         ////////////////////////////////////////////////////////////////////////////////////////////
