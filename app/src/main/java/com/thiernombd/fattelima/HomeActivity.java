@@ -2,21 +2,16 @@ package com.thiernombd.fattelima;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.Menu;
@@ -31,14 +26,12 @@ import android.widget.Toast;
 
 import com.thiernombd.fattelima_class.Alarm;
 
-import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
-import static android.app.AlarmManager.ELAPSED_REALTIME;
 import static android.app.AlarmManager.RTC;
+import static android.app.AlarmManager.RTC_WAKEUP;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -99,25 +92,38 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         timeToDisplay = alarmeTimePicker.getCurrentHour()+"h:"+alarmeTimePicker.getCurrentMinute()+"min";
-                        int hour =  alarmeTimePicker.getCurrentHour();
-                        int minutes =  alarmeTimePicker.getCurrentMinute();
-                        long timeInSecond = (hour*60 + minutes)*60;
-                        long currentTimeInMillis= System.currentTimeMillis();
+                        int alarmHour =  alarmeTimePicker.getCurrentHour();
+                        int alarmMinutes =  alarmeTimePicker.getCurrentMinute();
+                        Calendar calendar = Calendar.getInstance();
+                        Date dt = calendar.getTime();
+                        int tomorrow = alarmHour > dt.getHours() || (alarmHour == dt.getHours() && alarmMinutes > dt.getMinutes()) ? 0 : 1;
+                        //calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH),alarmeTimePicker.getCurrentHour(),alarmeTimePicker.getCurrentMinute());
+
+                        calendar.set(Calendar.HOUR,alarmeTimePicker.getCurrentHour());
+                        calendar.set(Calendar.MINUTE,alarmeTimePicker.getCurrentMinute());
+                        calendar.set(Calendar.SECOND,0);
+                        long alarmTimeInMillis= calendar.getTimeInMillis() + tomorrow*24*60*60*1000;
+
+                        long timeInSecond = (alarmHour*60 + alarmMinutes)*60;
+                        //long currentTimeInMillis= System.currentTimeMillis();
                         long now = (Calendar.getInstance().getTime().getMinutes() + Calendar.getInstance().getTime().getHours()*60)*60;
                         long offset = timeInSecond - now;
-                        long differenceOfTime = timeInSecond-Calendar.getInstance().getTimeInMillis()/1000;
+                        //long differenceOfTime = timeInSecond-Calendar.getInstance().getTimeInMillis()/1000;
 
                         Alarm newAlarm = new Alarm(timeToDisplay,libelle_et.getText().toString(),fileName_tv.getText().toString(),repeteDaysChoised);
                         adapter.addAlarmIn_rv(0,newAlarm);
-                        Toast.makeText(v.getContext(),"Alarm dans "+offset/60+" min",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(v.getContext(),"Alarm dans "+offset/60+" min",Toast.LENGTH_SHORT).show();
                         alarmeDialog.hide();
 
 
                         //////////////////////////// ALARMS//////////////////////
-                        Intent alarmLauncherIntent = new Intent(HomeActivity.this,AlarmLauncher.class);
-                        PendingIntent alarmLauncherPendingIntent = PendingIntent.getActivity(HomeActivity.this,0,alarmLauncherIntent,0);
+                        Intent alarmRingtoneActivityIntent = new Intent(HomeActivity.this,AlarmRingtoneActivity.class);
+                        PendingIntent alarmLauncherPendingIntent = PendingIntent.getActivity(HomeActivity.this,0,alarmRingtoneActivityIntent,0);
                         AlarmManager manager = (AlarmManager) HomeActivity.this.getSystemService(Context.ALARM_SERVICE);
-                        manager.set(RTC, System.currentTimeMillis()+1000, alarmLauncherPendingIntent);
+                        Toast.makeText(HomeActivity.this,alarmTimeInMillis+"" ,Toast.LENGTH_LONG).show();
+                        //Toast.makeText(HomeActivity.this,String.valueOf(tomorrow) ,Toast.LENGTH_LONG).show();
+                        //manager.set(RTC_WAKEUP, System.currentTimeMillis()+1000, alarmLauncherPendingIntent);
+                        manager.set(RTC_WAKEUP, alarmTimeInMillis, alarmLauncherPendingIntent);
 
 
                     }
