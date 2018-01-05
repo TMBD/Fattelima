@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.Menu;
@@ -24,8 +26,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.thiernombd.AlarmsDB.AlarmDBHandler;
+import com.thiernombd.AlarmsDB.AlarmDBManager;
 import com.thiernombd.fattelima_class.Alarm;
+import com.thiernombd.fattelima_class.AlarmView;
 
+import java.sql.SQLDataException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +55,11 @@ public class HomeActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+
+
+
+
         //******************************************************************************************
         ///////////////////////RECYCLERVIEW/////////////////////////////////////////////////////////
         LinearLayoutManager layout = new LinearLayoutManager(this);
@@ -56,11 +67,34 @@ public class HomeActivity extends AppCompatActivity {
 
         final RecyclerView homeRecyclerView = (RecyclerView) findViewById(R.id.listAlarm_rv);
         homeRecyclerView.setLayoutManager(layout);
-        List<Alarm> al = Alarm.getAlarmDataList();
-        adapter = new MyAdapter(al);
-        homeRecyclerView.setAdapter(adapter);
+
+        //Chargement des alamrs dans le rv
+        AlarmView.loadAlarmViewsOnRV(homeRecyclerView, this);
+
         //homeRecyclerView.setAnimation(new DefaultItemAnimator());
         ////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+        /*AlarmDBManager dbManager = new AlarmDBManager(AlarmDBHandler.DBNAME, this, AlarmDBHandler.VERSION);
+        dbManager.openWritableDB();
+        //dbManager.insertAlarmView(AlarmView.getAlarmDataList().get(1));
+        List<AlarmView> alV = dbManager.selectAlarmView();
+        //if( ! alV.isEmpty())
+        adapter.addAlarmIn_rv(0, alV.get(0));
+        Log.i("TTTTTT",String.valueOf(alV.get(2).id));
+        Log.i("AlarmV",AlarmDBHandler.ALARM_VIEW_T_CREATE);
+        Log.i("Alarm",AlarmDBHandler.ALARM_T_CREATE);
+        dbManager.close();*/
+       /* try {
+            dbManager.openWritableDB();
+        }catch (SQLiteException e){
+            e.printStackTrace();
+            //Log.e("erre",e.printStackTrace());
+        }*/
+
+
+
 
         //******************************************************************************************
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,40 +125,25 @@ public class HomeActivity extends AppCompatActivity {
                 alarmeTerminer_bt.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        timeToDisplay = alarmeTimePicker.getCurrentHour()+"h:"+alarmeTimePicker.getCurrentMinute()+"min";
-                        int alarmHour =  alarmeTimePicker.getCurrentHour();
-                        int alarmMinutes =  alarmeTimePicker.getCurrentMinute();
-                        Calendar calendar = Calendar.getInstance();
-                        Date dt = calendar.getTime();
-                        int tomorrow = alarmHour > dt.getHours() || (alarmHour == dt.getHours() && alarmMinutes > dt.getMinutes()) ? 0 : 1;
-                        //calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH),alarmeTimePicker.getCurrentHour(),alarmeTimePicker.getCurrentMinute());
 
-                        calendar.set(Calendar.HOUR,alarmeTimePicker.getCurrentHour());
-                        calendar.set(Calendar.MINUTE,alarmeTimePicker.getCurrentMinute());
-                        calendar.set(Calendar.SECOND,0);
-                        long alarmTimeInMillis= calendar.getTimeInMillis() + tomorrow*24*60*60*1000;
+                        String hour = String.valueOf(alarmeTimePicker.getCurrentHour());
+                        hour = hour.length() > 1 ? hour : "0"+hour;
+                        String min = String.valueOf(alarmeTimePicker.getCurrentMinute());
+                        min = min.length() > 1 ? min : "0"+min;
 
-                        long timeInSecond = (alarmHour*60 + alarmMinutes)*60;
-                        //long currentTimeInMillis= System.currentTimeMillis();
-                        long now = (Calendar.getInstance().getTime().getMinutes() + Calendar.getInstance().getTime().getHours()*60)*60;
-                        long offset = timeInSecond - now;
-                        //long differenceOfTime = timeInSecond-Calendar.getInstance().getTimeInMillis()/1000;
+                        timeToDisplay = hour + AlarmView.HOURSEPARATOR + min + AlarmView.MIN;
+                        long alarmTimeInMillis = Alarm.getTimeInMillis(alarmeTimePicker);
+                        int serviceId = AlarmView.getNewServiceId(HomeActivity.this);
+                        AlarmView newAlarmView = new AlarmView(serviceId, timeToDisplay, repeteDaysChoised, fileName_tv.getText().toString(), libelle_et.getText().toString());
 
-                        Alarm newAlarm = new Alarm(timeToDisplay,libelle_et.getText().toString(),fileName_tv.getText().toString(),repeteDaysChoised);
-                        adapter.addAlarmIn_rv(0,newAlarm);
-                        //Toast.makeText(v.getContext(),"Alarm dans "+offset/60+" min",Toast.LENGTH_SHORT).show();
+                        //ajout a la fois dans la vue et dans la base de donnees
+                        long alarmViewID = AlarmView.addAlarmView_DBView(newAlarmView, v.getContext());
+                        //Alarm(String millis, boolean repetition, boolean status, long alarmViewId)
+                        Alarm alarm = new Alarm(serviceId, String.valueOf(alarmTimeInMillis), repeter_cb.isChecked(), true, alarmViewID);
+                        Alarm.addAlarm_DBView(alarm, daysCheked, v.getContext());
+
+
                         alarmeDialog.hide();
-
-
-                        //////////////////////////// ALARMS//////////////////////
-                        Intent alarmRingtoneActivityIntent = new Intent(HomeActivity.this,AlarmRingtoneActivity.class);
-                        PendingIntent alarmLauncherPendingIntent = PendingIntent.getActivity(HomeActivity.this,0,alarmRingtoneActivityIntent,0);
-                        AlarmManager manager = (AlarmManager) HomeActivity.this.getSystemService(Context.ALARM_SERVICE);
-                        Toast.makeText(HomeActivity.this,alarmTimeInMillis+"" ,Toast.LENGTH_LONG).show();
-                        //Toast.makeText(HomeActivity.this,String.valueOf(tomorrow) ,Toast.LENGTH_LONG).show();
-                        //manager.set(RTC_WAKEUP, System.currentTimeMillis()+1000, alarmLauncherPendingIntent);
-                        manager.set(RTC_WAKEUP, alarmTimeInMillis, alarmLauncherPendingIntent);
-
 
                     }
                 });
@@ -187,6 +206,7 @@ public class HomeActivity extends AppCompatActivity {
         ////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////
+
     }
 
 

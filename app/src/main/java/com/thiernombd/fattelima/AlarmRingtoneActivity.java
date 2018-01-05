@@ -1,6 +1,8 @@
 package com.thiernombd.fattelima;
 
 import android.app.Activity;
+import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,8 +21,16 @@ public class AlarmRingtoneActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alarm_ringtone_layout);
 
+        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setMode(AudioManager.MODE_IN_CALL);
+        audioManager.setSpeakerphoneOn(true);
 
-        MediaPlayer media = new MediaPlayer();
+        MediaPlayer media = MediaPlayer.create(this, R.raw.o);
+        media.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        media.start();
+
+       /* MediaPlayer media = new MediaPlayer();
         try {
             //
             //  /mnt/sdcard
@@ -34,7 +44,7 @@ public class AlarmRingtoneActivity extends Activity {
             media.start();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
     }

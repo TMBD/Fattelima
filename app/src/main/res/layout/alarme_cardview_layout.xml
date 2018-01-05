@@ -8,6 +8,7 @@
     android:layout_marginLeft="5dp"
     android:elevation="5dp"
     android:padding="2dp"
+    android:id="@+id/alarm_card_view"
     app:cardCornerRadius="2dp">
 
     <RelativeLayout
@@ -35,6 +36,8 @@
             android:id="@+id/alarmeHour_tv"
             android:layout_width="150dp"
             android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:background="@drawable/costumize_button"
             android:clickable="true"
@@ -42,9 +45,7 @@
             android:text="20h:30min"
             android:textColor="@android:color/white"
             android:textSize="25sp"
-            android:textStyle="bold"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            android:textStyle="bold" />
 
         <ImageButton
             android:id="@+id/editAlarm_img"
@@ -60,9 +61,9 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignBottom="@+id/alarmeHour_tv"
-            app:srcCompat="@android:drawable/ic_menu_delete"
             android:layout_alignLeft="@+id/editAlarm_img"
-            android:layout_alignStart="@+id/editAlarm_img" />
+            android:layout_alignStart="@+id/editAlarm_img"
+            app:srcCompat="@android:drawable/ic_menu_delete" />
 
         <TextView
             android:id="@+id/alarmeSound_tv"
@@ -96,6 +97,20 @@
             android:text="TextView"
             android:textColor="@android:color/white"
             android:textSize="12sp" />
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="75dp"
+            android:layout_height="5dp"
+            android:showText="true"
+            android:switchMinWidth="10dp"
+            android:textOff="O"
+            android:textOn="I"
+            android:textStyle="italic"
+            android:typeface="sans"
+            android:layout_alignTop="@+id/deleteAlarm_img"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
     </RelativeLayout>
 

@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.thiernombd.fattelima_class.Alarm;
+import com.thiernombd.fattelima_class.AlarmView;
 
 import java.util.List;
 
@@ -21,11 +22,16 @@ import java.util.List;
  */
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    private List<Alarm> alarmObjectList;
+    private List<AlarmView> alarmObjectList;
 
-    public MyAdapter(List<Alarm> alarmeObj){
-        this.alarmObjectList = alarmeObj;
+    public MyAdapter(List<AlarmView> alarmViewObj){
+        this.alarmObjectList = alarmViewObj;
     }
+
+    public List<AlarmView> getAlarmObjectList(){
+        return this.alarmObjectList;
+    }
+
     @Override
     public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -35,8 +41,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(MyAdapter.MyViewHolder holder, int position) {
-        Alarm currentAlarm = alarmObjectList.get(position);
-        holder.display(currentAlarm,position);
+        AlarmView currentAlarmView = alarmObjectList.get(position);
+        holder.display(currentAlarmView,position);
     }
 
     @Override
@@ -51,7 +57,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         private final TextView alarmeLibelle_tv;
         private final ImageButton editeAlarme_img;
         private final ImageButton deleteAlarm_img;
-        private Alarm currentAlarm;
+        private AlarmView currentAlarmView;
         private int position;
 
         public MyViewHolder(View itemView){
@@ -68,7 +74,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 public void onClick(View v) {
                     new AlertDialog.Builder(v.getContext())
                             .setTitle("Libellé")
-                            .setMessage(currentAlarm.libelle)
+                            .setMessage(currentAlarmView.libelle)
                             .show();
                 }
             });
@@ -84,11 +90,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
 
 
-        public void display(Alarm current,int position) {
-            this.currentAlarm = current;
+        public void display(AlarmView current,int position) {
+            this.currentAlarmView = current;
             this.position = position;
-            alarmeDays_tv.setText(current.repeteDays);
-            alarmeHours_tv.setText(current.rtcSecond);
+            alarmeDays_tv.setText(current.days);
+            alarmeHours_tv.setText(current.hour);
             alarmeSound_tv.setText(current.ringFile);
             alarmeLibelle_tv.setText(current.libelle);
         }
@@ -100,8 +106,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         notifyItemRangeRemoved(position,alarmObjectList.size());
     }
 
-    public void addAlarmIn_rv(int position, Alarm alarm){
-        alarmObjectList.add(position,alarm);
+    public void addAlarmIn_rv(int position, AlarmView alarmView){
+        alarmObjectList.add(position,alarmView);
         notifyItemInserted(position);
         notifyItemRangeRemoved(position,alarmObjectList.size());
     }
