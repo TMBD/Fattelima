@@ -66,9 +66,17 @@ public class Alarm {
         for(int i = 0; i<alView.size(); i++){
             activeAlarm(alView.get(i), context);
         }
-
-
     }
+
+    public static List<Alarm> getAlarmsByAlarmViewID(long alarmViewID, Context context){
+        AlarmDBManager dbManager = new AlarmDBManager(AlarmDBHandler.DBNAME, context, AlarmDBHandler.VERSION);
+        dbManager.openReadableDB();
+        List<Alarm> al = dbManager.selectAlarmsByAlarmViewID(alarmViewID);
+        dbManager.close();
+        return al;
+    }
+
+
 
     //Ajouter un type Alarm dans la base de données et dans les services en prenant en compte les repetitions
     public static void addAlarm_DBView(Alarm al, SparseBooleanArray daysChecked, Context context){
@@ -84,6 +92,7 @@ public class Alarm {
 
     /*
     * Permet d'obtenir toutes les repetitions d'une Alarm pour pouvoir les utiliser comme des services
+    *
     * */
     public static ArrayList<Alarm> getAlarmsFromAlarm(Alarm al, SparseBooleanArray daysChecked){
         ArrayList<Alarm> arrayAlarms = new ArrayList<Alarm>();
@@ -148,6 +157,14 @@ public class Alarm {
                 manager.setRepeating(RTC_WAKEUP, Long.valueOf(alarm.millis), INTERVAL_DAY * 7, alarmLauncherPendingIntent);
             else manager.set(RTC_WAKEUP, Long.valueOf(alarm.millis), alarmLauncherPendingIntent);
         }
+    }
+
+    public static  void cancelAlarm(int alarmViewServiceId, Context context){
+        Intent alarmRingtoneActivityIntent = new Intent(context, AlarmRingtoneActivity.class);
+        PendingIntent alarmLauncherPendingIntent = PendingIntent.getActivity(context, alarmViewServiceId, alarmRingtoneActivityIntent, 0);
+        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        manager.cancel(alarmLauncherPendingIntent);
+
     }
 
 

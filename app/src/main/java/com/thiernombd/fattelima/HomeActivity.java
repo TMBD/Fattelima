@@ -1,6 +1,7 @@
 package com.thiernombd.fattelima;
 
 import android.app.AlarmManager;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -69,7 +70,7 @@ public class HomeActivity extends AppCompatActivity {
         homeRecyclerView.setLayoutManager(layout);
 
         //Chargement des alamrs dans le rv
-        AlarmView.loadAlarmViewsOnRV(homeRecyclerView, this);
+        AlarmView.loadAlarmViewsOnRV(homeRecyclerView, HomeActivity.this);
 
         //homeRecyclerView.setAnimation(new DefaultItemAnimator());
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,13 +135,15 @@ public class HomeActivity extends AppCompatActivity {
                         timeToDisplay = hour + AlarmView.HOURSEPARATOR + min + AlarmView.MIN;
                         long alarmTimeInMillis = Alarm.getTimeInMillis(alarmeTimePicker);
                         int serviceId = AlarmView.getNewServiceId(HomeActivity.this);
-                        AlarmView newAlarmView = new AlarmView(serviceId, timeToDisplay, repeteDaysChoised, fileName_tv.getText().toString(), libelle_et.getText().toString());
+                        //AlarmView(int serviceId, String hour, String days, boolean status, String ringFile, String libelle)
+                        AlarmView newAlarmView = new AlarmView(serviceId, timeToDisplay, repeteDaysChoised, true, fileName_tv.getText().toString(), libelle_et.getText().toString());
 
                         //ajout a la fois dans la vue et dans la base de donnees
-                        long alarmViewID = AlarmView.addAlarmView_DBView(newAlarmView, v.getContext());
+                        long alarmViewID = AlarmView.addAlarmView_DBView_2(newAlarmView, v.getContext());
                         //Alarm(String millis, boolean repetition, boolean status, long alarmViewId)
+                        //Alarm(int alarmViewServiceId, String millis, boolean repetition, boolean status, long alarmViewId)
                         Alarm alarm = new Alarm(serviceId, String.valueOf(alarmTimeInMillis), repeter_cb.isChecked(), true, alarmViewID);
-                        Alarm.addAlarm_DBView(alarm, daysCheked, v.getContext());
+                        Alarm.addAlarm_DBView(alarm, daysCheked, HomeActivity.this);
 
 
                         alarmeDialog.hide();

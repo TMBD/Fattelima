@@ -12,7 +12,7 @@ import android.util.Log;
 public class AlarmDBHandler extends SQLiteOpenHelper {
 
     public static final String DBNAME = "fattelima.db";
-    public static final int VERSION = 3;
+    public static final int VERSION = 7;
     //////////TABLES NAMES AND ATTRIBUTES/////////////////////////
     public static final String ALARM_T = "alarm_t";
     public static final String ALARM_VIEW_T = "alarm_view_t";
@@ -35,9 +35,11 @@ public class AlarmDBHandler extends SQLiteOpenHelper {
                     ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     SERVICEID + " INTEGER, " +
                     HOUR + " TEXT, " +
-                    DAYS + " TEXT, " +       //EVENT IF THE ALARM WILL REPETE (1) OR NOT (0)
+                    DAYS + " TEXT, " +
+                    STATUS + " INTEGER NOT NULL, " +
                     RING_FILE + " TEXT, " +
-                    LIBELLE+ " TEXT " +
+                    LIBELLE+ " TEXT ," +
+                    " CHECK ( " + STATUS + " = " + 0 + " or ( " + STATUS + " = " + 1 + " )) " +
                     " );";
 
     public static final String ALARM_T_CREATE =
@@ -51,8 +53,8 @@ public class AlarmDBHandler extends SQLiteOpenHelper {
                     ALARM_VIEW_T_ID + " INTEGER NOT NULL, " +
                     " CHECK ( " + REPETITION + " = " + 0 + " or ( " + REPETITION + " = " + 1 + " ))," +
                     " CHECK ( " + STATUS + " = " + 0 + " or ( " + STATUS + " = " + 1 + " )), " +
-                    " FOREIGN KEY ( " + ALARM_VIEW_T_ID + " ) REFERENCES " + ALARM_VIEW_T + " ( " + ID + " ) ON DELETE CASCADE ON UPDATE CASCADE " +
-                    " FOREIGN KEY ( " + ALARM_VIEW_T_SERVICEID + " ) REFERENCES " + ALARM_VIEW_T + " ( " + SERVICEID + " ) ON DELETE CASCADE ON UPDATE CASCADE" +
+                    " FOREIGN KEY ( " + ALARM_VIEW_T_ID + " ) REFERENCES " + ALARM_VIEW_T + " ( " + ID + " ) ON DELETE CASCADE ON UPDATE CASCADE, " +
+                    " FOREIGN KEY ( " + ALARM_VIEW_T_SERVICEID + " ) REFERENCES " + ALARM_VIEW_T + " ( " + SERVICEID + " ) ON DELETE CASCADE ON UPDATE CASCADE " +
                     " );";
 
     //////////////////////////////////////////////////
@@ -80,7 +82,5 @@ public class AlarmDBHandler extends SQLiteOpenHelper {
         db.execSQL(ALARM_VIEW_T_DROP);
         onCreate(db);
     }
-
-
 
 }

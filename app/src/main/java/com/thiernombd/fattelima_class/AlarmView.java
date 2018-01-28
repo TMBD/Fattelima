@@ -20,6 +20,7 @@ public class AlarmView {
     public int serviceId = 0;  //null pour l'insertion
     public String hour = null;
     public String days = null;
+    public boolean status = true;
     public String ringFile = null;
     public String libelle = null;
 
@@ -41,19 +42,21 @@ public class AlarmView {
 
     public AlarmView() {}
 
-    public AlarmView(long id, int serviceId, String hour, String days, String ringFile, String libelle) {
+    public AlarmView(long id, int serviceId, String hour, String days, boolean status, String ringFile, String libelle) {
         this.id = id;
         this.serviceId = serviceId;
         this.hour = hour;
         this.days = days;
+        this.status = status;
         this.ringFile = ringFile;
         this.libelle = libelle;
     }
 
-    public AlarmView(int serviceId, String hour, String days, String ringFile, String libelle) {
+    public AlarmView(int serviceId, String hour, String days, boolean status, String ringFile, String libelle) {
         this.serviceId = serviceId;
         this.hour = hour;
         this.days = days;
+        this.status = status;
         this.ringFile = ringFile;
         this.libelle = libelle;
     }
@@ -73,13 +76,14 @@ public class AlarmView {
     private static AlarmView[] getAlarms(){
         //String[] repet = new String[]{"Lun. Mar. Mer. Jeu. Ven. Sam. Dim", "erzere"};
         return  new AlarmView[]{
-                new AlarmView(00000000,"12h:30min","Mar. Mer. Sam. Dim","sdcard/download/myringfile","Je dois me reveiller"),
-                new AlarmView(123456789,"05h:30min","Lun. Mar. Mer. Jeu. Ven. Sam. Dim","sdcard/download/myringfile","Je dois me reveiller"),
-                new AlarmView(98765410,"12h:30min","Mar. Mer. Jeu. Ven.","sdcard/download/myringfile","Je dois me reveiller"),
+                new AlarmView(00000000, "12h:30min", "Mar. Mer. Sam. Dim", true,"sdcard/download/myringfile", "Je dois me reveiller"),
+                new AlarmView(123456789, "05h:30min", "Lun. Mar. Mer. Jeu. Ven. Sam. Dim", true, "sdcard/download/myringfile", "Je dois me reveiller"),
+                new AlarmView(98765410, "12h:30min", "Mar. Mer. Jeu. Ven.", true, "sdcard/download/myringfile", "Je dois me reveiller"),
                 /*new Alarm("10:00min","Aller à l'ecole","sdcard/Music/myringfile","Lun. Mar. Ven. Dim"),
                 */
         };
     }
+
 
     public static void loadAlarmViewsOnRV(RecyclerView rv, Context context){
         AlarmDBManager dbManager = new AlarmDBManager(AlarmDBHandler.DBNAME, context, AlarmDBHandler.VERSION);
@@ -92,13 +96,55 @@ public class AlarmView {
     }
 
 
+    /*
+    * Activer/desactiver les alarms pour lesquels l'AlarmView vient d'etre active/desactiver avec le bouton switch
+    */
+    public static void ToggleAlarmViewAlarm(long alarmViewID, boolean active, Context context){
+        List<Alarm> al = Alarm.getAlarmsByAlarmViewID(alarmViewID, context);
+        if(active){
+            for(int i = 0; i<al.size(); i++){
+                al.get(i).status = true;
+                Alarm.activeAlarm(al.get(i), context);
+
+            }
+        }else Alarm.cancelAlarm(al.get(0).alarmViewServiceId, context); // Cette ligne suffi pour desactiver tous les Alarm associés a cette AlarmView
+        //Mise à jour des status des alarms et des alarmView dans la bases de donnes
+        updateAlarmViewStatus(alarmViewID, active, context);
+    }
+
+    public static void updateAlarmViewStatus(long ID, boolean status, Context context){
+        AlarmDBManager dbManager = new AlarmDBManager(AlarmDBHandler.DBNAME, context, AlarmDBHandler.VERSION);
+        dbManager.openWritableDB();
+        dbManager.updateAlarmViewStatus(ID, status, context);
+        dbManager.close();
+    }
+
     public static long addAlarmView_DBView(AlarmView alView, Context context){
         AlarmDBManager dbManager = new AlarmDBManager(AlarmDBHandler.DBNAME, context, AlarmDBHandler.VERSION);
         dbManager.openWritableDB();
         long alarmViewID = dbManager.insertAlarmView(alView, context);
         dbManager.close();
+
         int position = getAlarmViewPosition(adapter.getAlarmObjectList(), alView);
         adapter.addAlarmIn_rv(position, alView);
+
+        return alarmViewID;
+    }
+
+
+    public static long addAlarmView_DBView_2(AlarmView alView, Context context){
+        AlarmDBManager dbManager = new AlarmDBManager(AlarmDBHandler.DBNAME, context, AlarmDBHandler.VERSION);
+        dbManager.openWritableDB();
+        long alarmViewID = dbManager.insertAlarmView_2(alView, context);
+
+        //Important : On affecte aussi l'id de l'AlarmView inserer recement a l'id de l'AlarmView qui doit etre affiché dans le recyclerView
+        // car sinon l'AlarmView qu'on doit ajouter n'aura pas d'id et donc lors de sa suppression/desactivation/modification dans la vue, on ne pourra pas supprimer/desactiver/modifier
+        // les Alarm associes a cette AlarmView du fait qu'on n'a pas son id.
+        alView.id = alarmViewID;
+
+        int position = getAlarmViewPosition(adapter.getAlarmObjectList(), alView);
+        adapter.addAlarmIn_rv(position, alView);
+
         return alarmViewID;
     }
 

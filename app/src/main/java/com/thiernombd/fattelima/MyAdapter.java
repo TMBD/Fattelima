@@ -2,14 +2,17 @@ package com.thiernombd.fattelima;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.thiernombd.fattelima_class.Alarm;
@@ -57,7 +60,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         private final TextView alarmeLibelle_tv;
         private final ImageButton editeAlarme_img;
         private final ImageButton deleteAlarm_img;
+        private final Switch activeAlarmToggle_sw;
         private AlarmView currentAlarmView;
+        private final View currentItemView;
         private int position;
 
         public MyViewHolder(View itemView){
@@ -68,7 +73,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             alarmeLibelle_tv = (TextView) itemView.findViewById(R.id.alarmeLibelle_tv);
             editeAlarme_img = (ImageButton) itemView.findViewById(R.id.editAlarm_img);
             deleteAlarm_img = (ImageButton) itemView.findViewById(R.id.deleteAlarm_img);
+            activeAlarmToggle_sw = (Switch) itemView.findViewById(R.id.activeAlarmToggle_sw);
+            currentItemView = itemView;
 
+            //if(currentAlarmView.status) itemView.setBackgroundColor(Color.BLUE);
             alarmeLibelle_tv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -86,9 +94,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 }
             });
 
+            activeAlarmToggle_sw.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlarmView.ToggleAlarmViewAlarm(currentAlarmView.id, activeAlarmToggle_sw.isChecked(), v.getContext());
+                    if(activeAlarmToggle_sw.isChecked()) currentItemView.setBackgroundResource(R.drawable.costumize_draw_rv);
+                    else currentItemView.setBackgroundColor(Color.rgb(215,215,215));
+
+                }
+            });
+
         }
-
-
 
         public void display(AlarmView current,int position) {
             this.currentAlarmView = current;
@@ -97,6 +113,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             alarmeHours_tv.setText(current.hour);
             alarmeSound_tv.setText(current.ringFile);
             alarmeLibelle_tv.setText(current.libelle);
+            activeAlarmToggle_sw.setChecked(current.status);
+
+            if(current.status) this.currentItemView.setBackgroundResource(R.drawable.costumize_draw_rv);
+            else this.currentItemView.setBackgroundColor(Color.rgb(215,215,215));
         }
     }
 
@@ -109,6 +129,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     public void addAlarmIn_rv(int position, AlarmView alarmView){
         alarmObjectList.add(position,alarmView);
         notifyItemInserted(position);
-        notifyItemRangeRemoved(position,alarmObjectList.size());
+        notifyItemRangeRemoved(position, alarmObjectList.size());
     }
 }

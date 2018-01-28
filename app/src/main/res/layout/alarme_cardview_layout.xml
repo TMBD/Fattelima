@@ -17,7 +17,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:background="?attr/colorButtonNormal"
         android:orientation="vertical">
 
         <TextView
@@ -54,6 +53,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:background="@color/colorMyOpacity"
             app:srcCompat="@android:drawable/ic_menu_edit" />
 
         <ImageButton
@@ -63,6 +63,7 @@
             android:layout_alignBottom="@+id/alarmeHour_tv"
             android:layout_alignLeft="@+id/editAlarm_img"
             android:layout_alignStart="@+id/editAlarm_img"
+            android:background="@color/colorMyOpacity"
             app:srcCompat="@android:drawable/ic_menu_delete" />
 
         <TextView
@@ -99,10 +100,11 @@
             android:textSize="12sp" />
 
         <Switch
-            android:id="@+id/switch1"
+            android:id="@+id/activeAlarmToggle_sw"
             android:layout_width="75dp"
             android:layout_height="5dp"
             android:showText="true"
+            android:checked="true"
             android:switchMinWidth="10dp"
             android:textOff="O"
             android:textOn="I"
